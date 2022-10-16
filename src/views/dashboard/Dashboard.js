@@ -18,7 +18,9 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import { CChartLine } from '@coreui/react-chartjs'
+
+import { CChart, CChartLine, CChartScatter } from '@coreui/react-chartjs'
+
 import { getStyle, hexToRgba } from '@coreui/utils'
 import CIcon from '@coreui/icons-react'
 import {
@@ -55,6 +57,38 @@ import WidgetsBrand from '../widgets/WidgetsBrand'
 import WidgetsDropdown from '../widgets/WidgetsDropdown'
 
 const Dashboard = () => {
+  const getData = async () => {
+    //const final = await fetch("/sensors?n=100&min_time=${new Date().getTime()-18000000}&max_time=${new Date().getTime()}").then(response => {
+    const final = await fetch('http://localhost/sensors?n=100')
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        let points = data.map((value) => {
+          return {
+            x: value.time,
+            y: value.co2,
+          }
+        })
+        console.log('From getData(): ', points)
+        return points
+      })
+      .catch(() => {
+        console.log("Couldn't get data!")
+      })
+    return final
+  }
+
+  var co2Data
+
+  const updateCO2 = async () => {
+    co2Data = await getData()
+
+    // Since the axes don't change, we don't need to call plot.setupGrid()
+    setTimeout(updateCO2, 1000)
+  }
+  updateCO2()
+
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
   const progressExample = [
@@ -208,52 +242,30 @@ const Dashboard = () => {
               </CButtonGroup>
             </CCol>
           </CRow>
-          <CChartLine
+          <CChartScatter
             style={{ height: '300px', marginTop: '40px' }}
             data={{
-              labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
               datasets: [
                 {
+                  type: 'scatter',
+                  showLine: true,
                   label: 'My First dataset',
                   backgroundColor: hexToRgba(getStyle('--cui-info'), 10),
                   borderColor: getStyle('--cui-info'),
                   pointHoverBackgroundColor: getStyle('--cui-info'),
                   borderWidth: 2,
-                  data: [
-                    random(50, 200),
-                    random(50, 200),
-                    random(50, 200),
-                    random(50, 200),
-                    random(50, 200),
-                    random(50, 200),
-                    random(50, 200),
-                  ],
+                  data: co2Data,
+                  /* data: [ */
+                  /*   { x: 0, y: random(50, 200) }, */
+                  /*   { x: random(1, 3), y: random(50, 200) }, */
+                  /*   { x: random(5, 8), y: random(50, 200) }, */
+                  /*   { x: random(10, 13), y: random(50, 200) }, */
+                  /*   { x: random(15, 18), y: random(50, 200) }, */
+                  /*   { x: random(20, 23), y: random(50, 200) }, */
+                  /*   { x: random(25, 28), y: random(50, 200) }, */
+                  /*   { x: random(30, 35), y: random(50, 200) }, */
+                  /* ], */
                   fill: true,
-                },
-                {
-                  label: 'My Second dataset',
-                  backgroundColor: 'transparent',
-                  borderColor: getStyle('--cui-success'),
-                  pointHoverBackgroundColor: getStyle('--cui-success'),
-                  borderWidth: 2,
-                  data: [
-                    random(50, 200),
-                    random(50, 200),
-                    random(50, 200),
-                    random(50, 200),
-                    random(50, 200),
-                    random(50, 200),
-                    random(50, 200),
-                  ],
-                },
-                {
-                  label: 'My Third dataset',
-                  backgroundColor: 'transparent',
-                  borderColor: getStyle('--cui-danger'),
-                  pointHoverBackgroundColor: getStyle('--cui-danger'),
-                  borderWidth: 1,
-                  borderDash: [8, 5],
-                  data: [65, 65, 65, 65, 65, 65, 65],
                 },
               ],
             }}
@@ -281,7 +293,7 @@ const Dashboard = () => {
               },
               elements: {
                 line: {
-                  tension: 0.4,
+                  tension: 0.2,
                 },
                 point: {
                   radius: 0,

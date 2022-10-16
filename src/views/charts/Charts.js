@@ -4,10 +4,12 @@ import {
   CChartBar,
   CChartDoughnut,
   CChartLine,
+  CChartScatter,
   CChartPie,
   CChartPolarArea,
   CChartRadar,
 } from '@coreui/react-chartjs'
+import StreamingPlugin from 'chartjs-plugin-streaming'
 import { DocsCallout } from 'src/components'
 
 const Charts = () => {
@@ -27,6 +29,7 @@ const Charts = () => {
           <CCardHeader>Bar Chart</CCardHeader>
           <CCardBody>
             <CChartBar
+              plugins={[StreamingPlugin]}
               data={{
                 labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
                 datasets: [
