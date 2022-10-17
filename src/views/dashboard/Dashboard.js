@@ -19,7 +19,10 @@ import {
   CTableRow,
 } from '@coreui/react'
 
-import { CChart, CChartLine, CChartScatter } from '@coreui/react-chartjs'
+import { Chart, registerables } from 'chart.js'
+import { Line, Chart as ReactChart } from 'react-chartjs-2'
+import 'chartjs-adapter-luxon'
+import StreamingPlugin from 'chartjs-plugin-streaming'
 
 import { getStyle, hexToRgba } from '@coreui/utils'
 import CIcon from '@coreui/icons-react'
@@ -56,38 +59,37 @@ import avatar6 from 'src/assets/images/avatars/6.jpg'
 import WidgetsBrand from '../widgets/WidgetsBrand'
 import WidgetsDropdown from '../widgets/WidgetsDropdown'
 
+Chart.register(StreamingPlugin, ...registerables)
+
 const Dashboard = () => {
+  var co2Data = [{ x: Date.now(), y: Math.random() }]
   const getData = async () => {
-    //const final = await fetch("/sensors?n=100&min_time=${new Date().getTime()-18000000}&max_time=${new Date().getTime()}").then(response => {
-    const final = await fetch('http://localhost/sensors?n=100')
-      .then((response) => {
-        return response.json()
-      })
-      .then((data) => {
-        let points = data.map((value) => {
-          return {
-            x: value.time,
-            y: value.co2,
-          }
-        })
-        console.log('From getData(): ', points)
-        return points
-      })
-      .catch(() => {
-        console.log("Couldn't get data!")
-      })
+    // const final = await fetch("/sensors?n=100&min_time=${new Date().getTime()-18000000}&max_time=${new Date().getTime()}").then(response => { //
+    // const final = await fetch('http:localhost/sensors?n=100')
+    //   .then((response) => {
+    //     return response.json()
+    //   })
+    //   .then((data) => {
+    //     let points = data.map((value) => {
+    //       return {
+    //         x: value.time,
+    //         y: value.co2,
+    //       }
+    //     })
+    //     console.log('From getData(): ', points)
+    //     return points
+    //   })
+    //   .catch(() => {
+    //     console.log("Couldn't get data!")
+    //   })
+    let final = {
+      x: Date.now(),
+      y: Math.random()
+    }
+    co2Data.push(final)
     return final
   }
 
-  var co2Data
-
-  const updateCO2 = async () => {
-    co2Data = await getData()
-
-    // Since the axes don't change, we don't need to call plot.setupGrid()
-    setTimeout(updateCO2, 1000)
-  }
-  updateCO2()
 
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
@@ -242,69 +244,45 @@ const Dashboard = () => {
               </CButtonGroup>
             </CCol>
           </CRow>
-          <CChartScatter
-            style={{ height: '300px', marginTop: '40px' }}
+          <Line
             data={{
-              datasets: [
-                {
-                  type: 'scatter',
-                  showLine: true,
-                  label: 'My First dataset',
-                  backgroundColor: hexToRgba(getStyle('--cui-info'), 10),
-                  borderColor: getStyle('--cui-info'),
-                  pointHoverBackgroundColor: getStyle('--cui-info'),
-                  borderWidth: 2,
-                  data: co2Data,
-                  /* data: [ */
-                  /*   { x: 0, y: random(50, 200) }, */
-                  /*   { x: random(1, 3), y: random(50, 200) }, */
-                  /*   { x: random(5, 8), y: random(50, 200) }, */
-                  /*   { x: random(10, 13), y: random(50, 200) }, */
-                  /*   { x: random(15, 18), y: random(50, 200) }, */
-                  /*   { x: random(20, 23), y: random(50, 200) }, */
-                  /*   { x: random(25, 28), y: random(50, 200) }, */
-                  /*   { x: random(30, 35), y: random(50, 200) }, */
-                  /* ], */
-                  fill: true,
-                },
-              ],
+              datasets: [{
+                label: 'Dataset 1',
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                borderColor: 'rgb(255, 99, 132)',
+                borderDash: [8, 4],
+                fill: true,
+                data: []
+              }, {
+                label: 'Dataset 2',
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgb(54, 162, 235)',
+                cubicInterpolationMode: 'monotone',
+                tension: 0.3,
+                fill: true,
+                data: []
+              }]
             }}
             options={{
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  display: false,
-                },
-              },
               scales: {
                 x: {
-                  grid: {
-                    drawOnChartArea: false,
-                  },
-                },
-                y: {
-                  ticks: {
-                    beginAtZero: true,
-                    maxTicksLimit: 5,
-                    stepSize: Math.ceil(250 / 5),
-                    max: 250,
-                  },
-                },
-              },
-              elements: {
-                line: {
-                  tension: 0.2,
-                },
-                point: {
-                  radius: 0,
-                  hitRadius: 10,
-                  hoverRadius: 4,
-                  hoverBorderWidth: 3,
-                },
-              },
+                  type: 'realtime',
+                  realtime: {
+                    refresh: 1000,
+                    delay: 2000,
+                    onRefresh: chart => {
+                      chart.data.datasets[0].data.push({
+                        x: Date.now(),
+                        y: Math.random()
+                      })
+                      getData()
+                      chart.data.datasets[1].data = co2Data
+                    }
+                  }
+                }
+              }
             }}
-          />
-        </CCardBody>
+          />        </CCardBody>
         <CCardFooter>
           <CRow xs={{ cols: 1 }} md={{ cols: 5 }} className="text-center">
             {progressExample.map((item, index) => (
@@ -320,7 +298,7 @@ const Dashboard = () => {
         </CCardFooter>
       </CCard>
 
-      <WidgetsBrand withCharts />
+      {/* <WidgetsBrand withCharts /> */}
 
       <CRow>
         <CCol xs>
