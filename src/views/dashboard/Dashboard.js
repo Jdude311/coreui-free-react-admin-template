@@ -62,7 +62,7 @@ import WidgetsDropdown from '../widgets/WidgetsDropdown'
 Chart.register(StreamingPlugin, ...registerables)
 
 const Dashboard = () => {
-  var co2Data = [{ x: Date.now(), y: Math.random() }]
+  var co2Data = []
   const getData = async () => {
     // const final = await fetch("/sensors?n=100&min_time=${new Date().getTime()-18000000}&max_time=${new Date().getTime()}").then(response => { //
     // const final = await fetch('http:localhost/sensors?n=100')
@@ -83,13 +83,12 @@ const Dashboard = () => {
     //     console.log("Couldn't get data!")
     //   })
     let final = {
-      x: Date.now(),
-      y: Math.random()
+      x: Date.now() + Math.ceil(Math.random() * 1000) - 500,
+      y: Math.random(),
     }
     co2Data.push(final)
     return final
   }
-
 
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
@@ -246,43 +245,52 @@ const Dashboard = () => {
           </CRow>
           <Line
             data={{
-              datasets: [{
-                label: 'Dataset 1',
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                borderColor: 'rgb(255, 99, 132)',
-                borderDash: [8, 4],
-                fill: true,
-                data: []
-              }, {
-                label: 'Dataset 2',
-                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                borderColor: 'rgb(54, 162, 235)',
-                cubicInterpolationMode: 'monotone',
-                tension: 0.3,
-                fill: true,
-                data: []
-              }]
+              datasets: [
+                {
+                  label: 'Dataset 1',
+                  backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                  borderColor: 'rgb(255, 99, 132)',
+                  borderDash: [8, 4],
+                  fill: true,
+                  data: [],
+                },
+                {
+                  label: 'Dataset 2',
+                  backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                  borderColor: 'rgb(54, 162, 235)',
+                  cubicInterpolationMode: 'monotone',
+                  tension: 0.3,
+                  fill: true,
+                  data: [],
+                },
+              ],
             }}
             options={{
+              plugins: {
+                streaming: {
+                  duration: 5 * 60 * 1000,
+                },
+              },
               scales: {
                 x: {
                   type: 'realtime',
                   realtime: {
-                    refresh: 1000,
-                    delay: 2000,
-                    onRefresh: chart => {
+                    refresh: 5000,
+                    delay: 6000,
+                    onRefresh: (chart) => {
                       chart.data.datasets[0].data.push({
                         x: Date.now(),
-                        y: Math.random()
+                        y: Math.random(),
                       })
                       getData()
                       chart.data.datasets[1].data = co2Data
-                    }
-                  }
-                }
-              }
+                    },
+                  },
+                },
+              },
             }}
-          />        </CCardBody>
+          />{' '}
+        </CCardBody>
         <CCardFooter>
           <CRow xs={{ cols: 1 }} md={{ cols: 5 }} className="text-center">
             {progressExample.map((item, index) => (
