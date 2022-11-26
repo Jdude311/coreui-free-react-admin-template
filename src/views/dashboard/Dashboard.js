@@ -65,28 +65,29 @@ const Dashboard = () => {
   var co2Data = []
   const getData = async () => {
     // const final = await fetch("/sensors?n=100&min_time=${new Date().getTime()-18000000}&max_time=${new Date().getTime()}").then(response => { //
-    // const final = await fetch('http:localhost/sensors?n=100')
-    //   .then((response) => {
-    //     return response.json()
-    //   })
-    //   .then((data) => {
-    //     let points = data.map((value) => {
-    //       return {
-    //         x: value.time,
-    //         y: value.co2,
-    //       }
-    //     })
-    //     console.log('From getData(): ', points)
-    //     return points
-    //   })
-    //   .catch(() => {
-    //     console.log("Couldn't get data!")
-    //   })
-    let final = {
-      x: Date.now() + Math.ceil(Math.random() * 1000) - 500,
-      y: Math.random(),
-    }
-    co2Data.push(final)
+    const final = await fetch('/sensors?n=200&min_time=${new Date().getTime-(30 * 60 * 1000)}')
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        let points = data.map((value) => {
+          return {
+            x: value.time,
+            y: value.CO2,
+          }
+        })
+        console.log('From getData(): ', points)
+        return points
+      })
+      .catch(() => {
+        console.log("Couldn't get data!")
+      })
+    // let final = {
+    //   x: Date.now() + Math.ceil(Math.random() * 1000) - 500,
+    //   y: Math.random(),
+    // }
+    // co2Data.push(final)
+    co2Data = final
     return final
   }
 
@@ -246,44 +247,50 @@ const Dashboard = () => {
           <Line
             data={{
               datasets: [
+                /* { */
+                /*   label: 'Dataset 1', */
+                /*   backgroundColor: 'rgba(255, 99, 132, 0.5)', */
+                /*   borderColor: 'rgb(255, 99, 132)', */
+                /*   borderDash: [8, 4], */
+                /*   fill: true, */
+                /*   data: [], */
+                /* }, */
                 {
-                  label: 'Dataset 1',
-                  backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                  borderColor: 'rgb(255, 99, 132)',
-                  borderDash: [8, 4],
-                  fill: true,
-                  data: [],
-                },
-                {
-                  label: 'Dataset 2',
+                  label: 'CO2 Live Feed',
                   backgroundColor: 'rgba(54, 162, 235, 0.5)',
                   borderColor: 'rgb(54, 162, 235)',
                   cubicInterpolationMode: 'monotone',
                   tension: 0.3,
                   fill: true,
                   data: [],
+                  pointRadius: 0,
                 },
               ],
             }}
             options={{
               plugins: {
                 streaming: {
-                  duration: 5 * 60 * 1000,
+                  duration: 30 * 60 * 1000,
                 },
               },
               scales: {
+                y: {
+                  type: 'linear',
+                  suggestedMin: 30,
+                  suggestedMax: 2000,
+                },
                 x: {
                   type: 'realtime',
                   realtime: {
                     refresh: 5000,
-                    delay: 6000,
+                    delay: 25000,
                     onRefresh: (chart) => {
-                      chart.data.datasets[0].data.push({
-                        x: Date.now(),
-                        y: Math.random(),
-                      })
+                      /* chart.data.datasets[0].data.push({ */
+                      /*   x: Date.now(), */
+                      /*   y: Math.random(), */
+                      /* }) */
                       getData()
-                      chart.data.datasets[1].data = co2Data
+                      chart.data.datasets[0].data = co2Data
                     },
                   },
                 },

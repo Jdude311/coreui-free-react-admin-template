@@ -134,46 +134,22 @@ const Widgets = () => {
         <DocsExample href="/components/widgets/#cwidgetstatse">
           <CRow>
             <CCol sm={4} lg={2}>
-              <CWidgetStatsE
-                className="mb-4"
-                title="title"
-                value="1,123"
-              />
+              <CWidgetStatsE className="mb-4" title="title" value="1,123" />
             </CCol>
             <CCol sm={4} lg={2}>
-              <CWidgetStatsE
-                className="mb-4"
-                title="title"
-                value="1,123"
-              />
+              <CWidgetStatsE className="mb-4" title="title" value="1,123" />
             </CCol>
             <CCol sm={4} lg={2}>
-              <CWidgetStatsE
-                className="mb-4"
-                title="title"
-                value="1,123"
-              />
+              <CWidgetStatsE className="mb-4" title="title" value="1,123" />
             </CCol>
             <CCol sm={4} lg={2}>
-              <CWidgetStatsE
-                className="mb-4"
-                title="title"
-                value="1,123"
-              />
+              <CWidgetStatsE className="mb-4" title="title" value="1,123" />
             </CCol>
             <CCol sm={4} lg={2}>
-              <CWidgetStatsE
-                className="mb-4"
-                title="title"
-                value="1,123"
-              />
+              <CWidgetStatsE className="mb-4" title="title" value="1,123" />
             </CCol>
             <CCol sm={4} lg={2}>
-              <CWidgetStatsE
-                className="mb-4"
-                title="title"
-                value="1,123"
-              />
+              <CWidgetStatsE className="mb-4" title="title" value="1,123" />
             </CCol>
           </CRow>
         </DocsExample>
